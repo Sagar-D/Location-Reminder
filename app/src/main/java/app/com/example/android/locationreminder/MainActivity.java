@@ -20,10 +20,18 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
 
 	private RecyclerView recyclerView;
 	private RecyclerView.Adapter adapter;
@@ -188,11 +196,18 @@ public class MainActivity extends AppCompatActivity {
 				break;
 
 			case R.id.type2:
-				i = new Intent(this, DisplayLocation.class);
-				i.putExtra("note_head", s);
-				i.putExtra("note_details", d);
-				i.putExtra("where", "new");
-				startActivity(i);
+				PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+				Intent intent = null;
+				try {
+					intent = intentBuilder.build(MainActivity.this);
+				} catch (GooglePlayServicesRepairableException e) {
+					e.printStackTrace();
+				} catch (GooglePlayServicesNotAvailableException e) {
+					e.printStackTrace();
+				}
+
+				// Start the Intent by requesting a result, identified by a request code.
+				startActivityForResult(intent, 1);
 				break;
 			case R.id.type3:
 				i = new Intent(this, DisplayAlarm.class);
@@ -228,5 +243,36 @@ public class MainActivity extends AppCompatActivity {
 						finish();
 					}
 				}).setNegativeButton("no", null).show();
+	}
+
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode==1)
+		{
+			if(resultCode==RESULT_OK){
+
+				Place place = PlacePicker.getPlace(data, this);
+				LatLng latLang = place.getLatLng();
+				Double latitude = latLang.latitude;
+				Double longitute = latLang.longitude;
+
+				//Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+
+
+				Intent i;
+				String s = "Heading";
+				String d = "Add Description";
+				i = new Intent(this, DisplayLocation.class);
+				i.putExtra("note_head", s);
+				i.putExtra("note_details", d);
+				i.putExtra("where", "new");
+				i.putExtra("latitude",latitude.toString());
+				i.putExtra("longitude",longitute.toString());
+				startActivity(i);
+			}else
+				Toast.makeText(MainActivity.this, "HELLO..I DIDNT GOT THE PLACE", Toast.LENGTH_SHORT).show();
+
+		}
 	}
 }

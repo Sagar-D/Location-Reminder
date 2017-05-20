@@ -29,6 +29,7 @@ public class DisplayLocation extends AppCompatActivity {
     RadioButton rb1;
     SQLiteDatabase db;
     private LocationListener lListener;
+    Double latitude,longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,10 @@ public class DisplayLocation extends AppCompatActivity {
 
         String s = i.getStringExtra("note_head");
         String d = i.getStringExtra("note_details");
-        HeadView.setText(s);
-        ContentView.setText(d);
+
+
+        //HeadView.setText(s);
+        //ContentView.setText(d);
         //HeadEdit.setText(s);
         //ContentEdit.setText(d);
         HeadEdit.setHint(s);
@@ -71,6 +74,8 @@ public class DisplayLocation extends AppCompatActivity {
 
         String con=i.getStringExtra("where");
         if(con.equals("new")) {
+            latitude = Double.parseDouble(i.getStringExtra("latitude"));
+            longitude = Double.parseDouble(i.getStringExtra("longitude"));
             edit(fab);
         }
 
@@ -95,7 +100,7 @@ public class DisplayLocation extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
                 //Toast.makeText(getApplicationContext(), "Inside", Toast.LENGTH_SHORT).show();
-                rb1.setText("Use current location (" + location.getLatitude() + ", " + location.getLongitude() + ")");
+                //rb1.setText("Use current location (" + location.getLatitude() + ", " + location.getLongitude() + ")");
             }
 
             @Override
@@ -116,7 +121,7 @@ public class DisplayLocation extends AppCompatActivity {
 
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 0, lListener);
         Location lc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        rb1.setText("Use current location (" + lc.getLatitude() + ", " + lc.getLongitude() + ")");
+        rb1.setText("Use location (" + latitude + ", " + longitude + ")");
 
     }
 
@@ -139,14 +144,15 @@ public class DisplayLocation extends AppCompatActivity {
         c.moveToFirst();
         val = new ContentValues();
         val.put("id", c.getInt(c.getColumnIndex("id")));
-        val.put("lat", lc.getLatitude());
-        val.put("long", lc.getLongitude());
+        val.put("lat", latitude);
+        val.put("long", longitude);
         db.insert("loc", null, val);
         lm.removeUpdates(lListener);
 
         HeadView.setVisibility(View.VISIBLE);
         ContentView.setVisibility(View.VISIBLE);
         Locat.setVisibility(View.VISIBLE);
+        Locat.setText("Using Location ( "+latitude+" , "+longitude+" )");
         HeadEdit.setVisibility(View.INVISIBLE);
         ContentEdit.setVisibility(View.INVISIBLE);
         rb1.setVisibility(View.INVISIBLE);

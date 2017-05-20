@@ -151,7 +151,8 @@ public class  ListenerService extends Service {
                         double dist = Math.sqrt(Math.pow(clat - tlat, 2) + Math.pow(clong - tlong, 2));
                         Log.i("dist", "dist: " + dist);
 
-                        if (dist < 1) {
+                        if (dist < 0.02) {
+                            Log.i("***Heading",c.getString(c.getColumnIndex("heading")));
                             Log.i("***********************", "Inside");
                             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                             Intent i1 = new Intent(getApplicationContext(), DisplayLocation.class);
@@ -166,6 +167,7 @@ public class  ListenerService extends Service {
                                     .setSmallIcon(android.R.drawable.ic_menu_mylocation)
                                     .setVibrate(new long[]{100, 0, 300, 0, 10, 0, 50, 0, 100})
                                     .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+                                    .setOnlyAlertOnce(true)
                                     .build();
                             nm.notify(0, n);
                         }
